@@ -71,10 +71,12 @@
                   <input onkeyup="search(this)" type="text" class="form-control">
                   <i class="fas fa-search" style="position: absolute; margin-top: -27px !important; margin-left: 85%;z-index: 2;"></i>
               </div> 
+              {% if request.user.is_authenticated %}
               <a class="btn btn-primary ms-3 my-auto" href="{% url 'obra:cadastrar' %}">
                 <i class="fas fa-book me-2"></i>
                 CADASTRAR OBRA
               </a>  
+              {% endif %}
             </div>
         </div>                
         <div class="row">

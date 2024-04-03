@@ -40,6 +40,8 @@ def cadastrar_empresa(request):
                 'success': 'Empresa cadastrada com sucesso!'
             }
             return render(request, 'fiscalizacao/cadastrar_empresa.html', context) 
+        else:
+            print(form.errors)
     else:
         form=Form_Empresa(initial={'cadastrado_por':request.user})
     # print(form)           
@@ -485,7 +487,7 @@ def cadastrar_empenho(request, contrato_id):
     }
     return render(request, 'fiscalizacao/cadastrar_empenho.html', context)
 
-@login_required
+
 def get_obras(request):
     from django.db.models import Q
 
@@ -509,7 +511,7 @@ def get_obras(request):
         }
     return render(request, 'fiscalizacao/get_obras.html', context)
 
-@login_required
+
 def listar_obras(request, valor_busca):
     obras=Contrato.objects.all()
     context={

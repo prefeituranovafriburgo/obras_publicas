@@ -28,6 +28,9 @@
                 {% endif %}
                 {{f|add_class:'form-control mb-3'}}            
                 {% endfor %}
+                <small class="text-danger">
+                    {{form.errors.cnpj}}
+                </small>
                 {% buttons %}
                     <button type="submit" class="btn btn-primary">CONFIRMAR</button>
                 {% endbuttons %}
@@ -54,4 +57,9 @@
         v_obj.value=v_fun(v_obj.value)
     }    
 </script>
+<style>
+    small li{
+        list-style-type: none;
+    }
+</style>
 {% endblock %}
