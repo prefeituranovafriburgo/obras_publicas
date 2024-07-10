@@ -78,12 +78,27 @@
                                     <b>Fiscal Substituto:</b><br>                      
                                     <span>{{obra.obra.fiscal_substituto}}</span>
                                 </td>   
-                                <td colspan="2" class="px-3 row">
+                                <td colspan="2" class="px-3">
                                     <b>Status:</b> <br>                     
-                                    <span class='{% if obra.obra.status.nome == "Em andamento" %}bg-info{% elif obra.obra.status.nome == "Paralisada" %}bg-warning{% elif obra.obra.status.nome == "Finalizada" %}bg-success{% endif %} text-white text-center bolder p-1 w-100' >{{obra.obra.status}}</span>
+                                    <span class='{% if obra.obra.status.nome == "Em andamento" %}bg-info{% elif obra.obra.status.nome == "Paralisada" %}bg-warning{% elif obra.obra.status.nome == "Finalizada" %}bg-success{% endif %} bolder' >{{obra.obra.status.nome}}</span>
                                 </td>  
                                  
                             </tr>   
+                            <tr>
+                                <td colspan="2" class="px-3">
+                                    <b>Nº processo administrativo:</b><br><span>{{obra.obra.n_processo_adm}}</span>
+                                </td>
+                                <td colspan="2" class="px-3">
+                                    <b>Nº do contrato:</b><br><span>{{obra.obra.n_contrato}}</span>
+                                </td>
+                                <td colspan="2" class="px-3">
+                                    <b>Nº processo de pagamento:</b><br><span class="text-capitalize">{{obra.obra.n_processo_pagamento}}</span>
+                                </td>
+                                <td colspan="2"></td>
+                         
+                                     
+
+                            </tr>
                             <tr>
                                 <td colspan="8" class="px-3">
                                     <b>Data prevista de conclusão:</b><br>
@@ -98,19 +113,8 @@
                                     </p>
                                 </td>
                             </tr>
-                            {% if request.user.is_authenticated %}
-                            <tr>
-                                <td colspan="2">
-                                    <b class="ms-2 me-3">Nº processo administrativo:</b> <span>{{obra.obra.n_processo_adm}}</span>
-                                </td>
-                                <td colspan="4" >
-                                    <b>Nº processo de pagamento:</b> <span class="text-capitalize ms-3">{{obra.obra.n_processo_pagamento}}</span>
-                                </td>
-                                <td colspan="2" ></td>
-                         
-                                     
-
-                            </tr>
+                            
+                            
                             <tr>
                                 <td colspan="2">
                                     <b class="ms-2">Data de Inclusão:</b> <span>{{obra.obra.dt_inclusao}}</span>
@@ -122,7 +126,7 @@
                                 <td></td>                               
 
                             </tr>
-                            {% endif %}
+                            
                         </tbody>
                     </table>
                 </div>

@@ -4,6 +4,10 @@ from django.contrib.auth.models import User
 
 
 class Status(models.Model):
+
+    class Meta:
+        verbose_name_plural = 'Situações das Obras'
+        verbose_name = 'Situação da Obra'
     nome=models.CharField(max_length=50)
     
     def __str__(self):
@@ -80,6 +84,11 @@ class Empresa(models.Model):
         return '%s' % (self.nome)
 
 class Fiscal(models.Model):
+
+    class Meta:
+        verbose_name_plural = 'Fiscais'
+        verbose_name = 'Fiscal'
+
     nome=models.CharField(max_length=150, verbose_name='Nome do Fiscal')
     crea=models.CharField(max_length=150, verbose_name='CREA')
     matricula=models.CharField(max_length=150, verbose_name='Matrícula')
@@ -91,6 +100,7 @@ class Fiscal(models.Model):
 class Obra(models.Model):        
 
     n_processo_adm=models.CharField(max_length=50, default='', blank=True, verbose_name='Número do Processo Administrativo') 
+    n_contrato=models.CharField(max_length=50, default='', blank=True, verbose_name='Número do contrato') 
     objeto_da_obra=models.CharField(max_length=150, verbose_name='Objeto da obra')
     populacao_atendida=models.CharField(max_length=150, verbose_name='População atendida')
     valor_previsto=models.CharField(max_length=20, verbose_name='Valor previsto do contrato (R$)')
@@ -134,7 +144,12 @@ class Obra_Fiscal(models.Model):
     fiscal=models.ForeignKey(Fiscal, on_delete=models.CASCADE)
     status=models.CharField(max_length=1, choices=STATUS_CHOICES)
 
-class Fotos(models.Model):   
+class Fotos(models.Model): 
+
+    class Meta:
+        verbose_name_plural = 'Fotos'
+        verbose_name = 'Foto'
+          
     obra=models.ForeignKey(Obra, on_delete=models.CASCADE) 
     url=models.CharField(max_length=300)
 
