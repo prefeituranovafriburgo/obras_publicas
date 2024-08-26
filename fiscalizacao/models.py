@@ -41,6 +41,10 @@ class Nota_Empenho(models.Model):
     abatido=models.BooleanField(default=False)
     dt_inclusao = models.DateTimeField(auto_now_add=True, verbose_name='Dt. Inclusão') 
 
+    def get_valor(self):
+        valor = self.valor
+        valor_formatado = f"{int(valor) / 100:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        return valor_formatado
 
     def __str__(self):
         return '%s' % (self.n_nota)
@@ -66,13 +70,24 @@ class Nota_Fiscal(models.Model):
     obs=models.TextField(verbose_name='Observações')
     dt_inclusao = models.DateTimeField(auto_now_add=True, verbose_name='Dt. Inclusão') 
 
-
+    def get_valor(self):
+        valor = self.valor
+        valor_formatado = f"{int(valor) / 100:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        return valor_formatado
+    
     def __str__(self):
         return '%s - %s' % (self.id, self.n_nota)
+
+    
+    class Meta:
+        verbose_name_plural = 'Notas Fiscais'
+        verbose_name = 'Nota Fiscal'
+        ordering = ['periodo_inicial']
 
 class Nota_Fiscal_Arquivada(models.Model):    
     nota=models.ForeignKey(Nota_Fiscal, on_delete=models.CASCADE)
     dt_arquivado=models.DateTimeField(auto_now_add=True, verbose_name='Arquivado em') 
+
     
 class Empresa(models.Model):
     nome=models.CharField(max_length=150, verbose_name='Nome da empresa')
@@ -110,6 +125,7 @@ class Obra(models.Model):
     fiscal_substituto=models.ForeignKey(Fiscal,on_delete=models.PROTECT, verbose_name='Fiscal substituto', related_name='substituto')
     engenheiro=models.CharField(max_length=250, verbose_name='Nome do engenheiro responsável', default='')
     justificativa=models.TextField(verbose_name='Justificativa')
+    data_inicio=models.DateField(verbose_name='Data de início', blank=True, null=True)
     data_conclusao=models.DateField(verbose_name='Data prevista de conclusão', blank=True, null=True)
     cadastrado_por=models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
     dt_inclusao = models.DateTimeField(auto_now_add=True, verbose_name='Dt. Inclusão') 
@@ -117,6 +133,12 @@ class Obra(models.Model):
     
     def __str__(self):
         return '%s %s' % (self.id, self.objeto_da_obra)
+    
+    def get_valor_previsto(self):
+        valor = self.valor_previsto
+        # Converte a string em um número decimal, divide por 100 e formata com duas casas decimais e separadores de milhar
+        valor_formatado = f"{int(valor) / 100:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        return valor_formatado
 
 class Contrato(models.Model): 
 
@@ -124,7 +146,33 @@ class Contrato(models.Model):
     empresa=models.ForeignKey(Empresa, on_delete=models.PROTECT, verbose_name='Empresa contratada')
     nota_empenho=models.ManyToManyField(Nota_Empenho, blank=True)
     dt_inclusao = models.DateTimeField(auto_now_add=True, verbose_name='Dt. Inclusão') 
+    user_inclusao = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
 
+    def get_valor_total(self):
+        valor_previsto = self.obra.valor_previsto
+        valor_aditivado = self.get_valor_aditivos().replace(".", "").replace(",", "")
+        valor_total = int(valor_previsto) + int(valor_aditivado)
+        valor_total = f"{valor_total / 100:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        return valor_total
+    def get_aditivos(self):
+        aditivos = Aditivar.objects.filter(contrato=self)
+        return aditivos
+    
+    def possui_aditivos(self):
+        return Aditivar.objects.filter(contrato=self).exists()
+    
+    def get_valor_aditivos(self):
+        aditivos = Aditivar.objects.filter(contrato=self)
+        # print(aditivos)
+        valor_aditivos = 0
+        for aditivo in aditivos:
+            valor_aditivos += int(aditivo.valor)
+        valor_aditivos = f"{valor_aditivos / 100:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        return valor_aditivos
+    
+    def possui_reajustes(self):
+        return Reajustar.objects.filter(contrato=self).exists()
+    
     def __str__(self):
         return '%s - %s' % (self.id, self.nota_empenho)
 
@@ -156,10 +204,24 @@ class Fotos(models.Model):
     def __str__(self):
         return '%s' % (self.url)
 
-class Aditivo(models.Model):
-    prazo=models.BooleanField()
-    valor=models.BooleanField()
-    id_empenho=models.CharField(max_length=50)
+# class Aditivo(models.Model):
+#     prazo=models.BooleanField()
+#     valor=models.BooleanField()
+#     id_empenho=models.CharField(max_length=50)
+
+class Aditivar(models.Model):
+    contrato = models.ForeignKey(Contrato, on_delete=models.CASCADE)
+    inicio=models.DateField(verbose_name='Data de início/reinício')
+    fim=models.DateField(verbose_name='Data de término')
+    valor=models.CharField(max_length=20,verbose_name='Valor do aditivo(R$)')
+    dt_inclusao = models.DateTimeField(auto_now_add=True, verbose_name='Dt. Inclusão')
+    user_inclusao = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+
+class Reajustar(models.Model):
+    percentual = models.CharField(max_length=10, verbose_name='Percentual de reajuste')
+    valor = models.CharField(max_length=20, verbose_name='Valor do reajuste(R$)')
+    dt_inclusao = models.DateTimeField(auto_now_add=True, verbose_name='Dt. Inclusão')
+    user_inclusao = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
 
 class Log(models.Model):
 

@@ -123,33 +123,10 @@
 
                             </tr>
                             <tr>
-                                {% if contrato.possui_reajuste %}
-                                <td colspan="1" class="px-3">
-                                    <b>Data de início:</b><br>
-                                    <span>{{obra.obra.data_conclusao}}</span>
-                                </td>
-                                <td colspan="1" class="px-3">
+                                <td colspan="8" class="px-3">
                                     <b>Data prevista de conclusão:</b><br>
                                     <span>{{obra.obra.data_conclusao}}</span>
                                 </td>
-                                <td colspan="1" class="px-3">
-                                    <b>Data de início/reinício de reajuste:</b><br>
-                                    <span>{{obra.obra.data_conclusao}}</span>
-                                </td>
-                                <td colspan="1" class="px-3">
-                                    <b>Data de fim   de reajuste:</b><br>
-                                    <span>{{obra.obra.data_conclusao}}</span>
-                                </td>
-                                {% else %}
-                                <td colspan="1" class="px-3">
-                                    <b>Data de início:</b><br>
-                                    <span>{{obra.obra.data_conclusao}}</span>
-                                </td>
-                                <td colspan="7" class="px-3">
-                                    <b>Data prevista de conclusão:</b><br>
-                                    <span>{{obra.obra.data_conclusao}}</span>
-                                </td>
-                                {% endif %}
                             </tr>
                             <tr>
                                 <td colspan="8" class="p-3">

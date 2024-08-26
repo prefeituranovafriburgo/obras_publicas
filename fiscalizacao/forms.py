@@ -1,4 +1,4 @@
-from .models import Contrato, Empresa, Fiscal, Nota_Empenho, Nota_Fiscal, Obra
+from .models import Contrato, Empresa, Fiscal, Nota_Empenho, Nota_Fiscal, Obra, Aditivar
 from .validations import validate_CNPJ
 
 from django import forms
@@ -12,6 +12,7 @@ class Form_Obras(ModelForm):
                    'valor_previsto': forms.TextInput(attrs={'onkeydown':"maskValor(this)", 'onload':"maskValor(this)"}),
                    'status': forms.Select(attrs={'class':'form-select mb-3'}),
                    'fiscal': forms.Select(attrs={'class':'form-select mb-3'}),
+                   'data_inicio': forms.DateInput(attrs={'type':'date', 'class':'form-control mb-3'}),
                    'fiscal_substituto': forms.Select(attrs={'class':'form-select mb-3'}),}
         exclude = ['dt_inclusao']
     
@@ -97,3 +98,21 @@ class Form_Contrato(ModelForm):
     class Meta:
         model = Contrato        
         exclude = ['dt_inclusao']
+
+class Form_Aditivo(ModelForm): 
+
+    class Meta:
+        model = Aditivar
+        widgets = {
+            'contrato': forms.HiddenInput(),
+            'valor': forms.TextInput(attrs={'onkeydown':"maskValor(this)", 'onload':"maskValor(this)", 'class':'form-control mb-3'}),
+            'inicio': forms.DateInput(attrs={'type':'date', 'class':'form-control mb-3'}),
+            'fim': forms.DateInput(attrs={'type':'date', 'class':'form-control mb-3'}),  
+            }        
+        exclude = ['dt_inclusao']
+
+    def clean_valor(self):                        
+        valor=self.cleaned_data["valor"]
+        valor = valor.replace('.', '')
+        valor = valor.replace(',', '')        
+        return valor

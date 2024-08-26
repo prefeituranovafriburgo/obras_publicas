@@ -24,6 +24,7 @@ urlpatterns = [
     path('dados-obras/v/<id>', views.visualizar_obra, name='visualizar_obra' ),
     
     path('dados-obras/v/<id>/editar', views.editar_obra, name='editar_obra' ),
+    path('dados-obras/v/<id>/aditivar', views.aditivar_empenho, name='aditivar' ),
 
     path('dados-obras/v/<id>/fotos', views.visualizar_fotos_obra, name='visualizar_fotos_obra' ),
     path('dados-obras/v/<id>/fotos/<url>', views.visualizar_foto_obra, name='visualizar_foto_obra' ),

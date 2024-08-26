@@ -12,7 +12,12 @@ def progresso_obra(contratos, ativo=True):
     soma_empenhos=0
     soma_notas=0  
     previsto=int(contratos.obra.valor_previsto)  
+    print(previsto)
+    if contratos.possui_aditivos():
+        previsto+=int(contratos.get_valor_aditivos().replace('.', '').replace(',', ''))
+        print(int(contratos.get_valor_aditivos().replace('.', '').replace(',', '')))
     ids=[]
+    print(previsto)
     for i in contratos.nota_empenho.all():
         soma_empenhos+=int(i.valor)
         notas_fiscais=Nota_Fiscal.objects.filter(empenho=i, ativo=True)
@@ -20,6 +25,7 @@ def progresso_obra(contratos, ativo=True):
             soma_notas+=int(n.valor)
         
     percent=previsto/100.00
+    print(percent)
     return soma_notas, percent, soma_empenhos, previsto
 
 def testarSeFoiAbatido(nota):

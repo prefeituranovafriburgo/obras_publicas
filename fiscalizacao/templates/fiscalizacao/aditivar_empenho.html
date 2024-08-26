@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% load widget_tweaks %} 
+{% block main %}
+{% if success %}
+<div class="row px-4 py-2">
+    <div class="col bg-success d-flex">
+        <p class="text-white m-auto fw-bolder py-1">{{success}}</p>
+    </div>
+</div>
+{%endif%}
+<div class="row">    
+    <div class="col container p-5">
+        <div class="d-flex">
+            <h1 class="text-uppercase">Cadastrar aditivo</h1>            
+            <span class="ms-auto">
+                <a class="btn btn-primary" href="{% url 'obra:visualizar_obra' id %}">
+                    <i class="far fa-arrow-alt-circle-left me-2"></i>
+                    Voltar
+                </a>
+            </span>
+        </div>
+        <form method="post" class="form col-5">            
+            {% csrf_token %}
+            <br>
+            <div id="contrato">
+            {{form}}
+                    <button type="submit" class="btn btn-primary">CONFIRMAR</button>
+            </div>         
+        </form>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.15/jquery.mask.min.js"></script>
+<script>
+    
+    function maskValor(input){    
+        $(input).mask('#.##0.000,00', {reverse: true});
+    } 
+</script>
+{% endblock %}

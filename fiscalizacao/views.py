@@ -1,7 +1,7 @@
 from textwrap import indent
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
-from .forms import Form_Contrato, Form_Fiscal, Form_Nota, Form_Empenho_Desabilitado, Form_Empenho, Form_Obras, Form_Empresa
+from .forms import Form_Contrato, Form_Fiscal, Form_Nota, Form_Empenho_Desabilitado, Form_Empenho, Form_Obras, Form_Empresa, Form_Aditivo
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
@@ -316,6 +316,7 @@ def get_notas(request):
         except:
             soma_notas+=0
 
+    soma_notas = f"{soma_notas / 100:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
     context={
         'filter': request.GET.get('filter'),
         'notas': notas,        
@@ -401,6 +402,7 @@ def cadastrar_obra(request):
                     obra.cadastrado_por=request.user
                     obra.save()
                     contrato=Contrato(obra=obra, empresa=empresa)
+                    contrato.user_inclusao=request.user
                     contrato.save()
                     try:
                         for i in list_empenhos:
@@ -487,6 +489,28 @@ def cadastrar_empenho(request, contrato_id):
     }
     return render(request, 'fiscalizacao/cadastrar_empenho.html', context)
 
+@login_required
+def aditivar_empenho(request, id):
+    success=''
+    if request.method=='POST':
+        form=Form_Aditivo(request.POST)
+        if form.is_valid():
+            aditivo = form.save()                                                   
+            aditivo.user_inclusao=request.user
+            form=Form_Empenho()
+            success='Aditivo cadastrado com sucesso!'
+    else:
+        form=Form_Aditivo(initial={'contrato': id})
+
+    context={
+        'id': id,
+        'form': form,
+        'success': success
+    }
+    return render(request, 'fiscalizacao/aditivar_empenho.html', context)
+
+def reajustar(request, id):
+    return ''
 
 def get_obras(request):
     from django.db.models import Q
@@ -521,8 +545,43 @@ def listar_obras(request, valor_busca):
 
 def visualizar_obra(request, id):
     obra=Contrato.objects.get(id=id)
+    if request.method=='POST':  
+        form=Form_Nota(request.POST)                
+        if form.is_valid():
+            nota=form.save()
+            nota.ativo=True
+            nota.save()    
+            if testarSeFoiAbatido(nota):
+                nota.empenho.abatido=True
+                nota.empenho.save()
+        else: 
+            print(form.errors)                    
+    else:
+        # form=Form_Nota(initial={'cadastrado_por':request.user})
+        form=Form_Nota()
+    
+    contratos=Contrato.objects.get(id=id)
+    soma_notas, percent, soma_empenhos, previsto=progresso_obra(contratos)
+    if percent!=0:
+        progresso=int(soma_notas/percent)
+        if progresso >= 100:
+            progresso=100            
+    else:
+        progresso=0
+    empenhos_exercicio=contratos.nota_empenho.filter(ativo=True)
+    v_total=0
+    for nota in empenhos_exercicio:
+        v_total+=int(nota.valor)
+
     context={
-        'obra': obra
+        'contrato': obra,
+        'obra': obra,
+        'notas':empenhos_exercicio,
+        'form': form,
+        'progresso': progresso,
+        'soma_empenhos': v_total,
+        'soma_notas': f"{soma_notas/ 100:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."),
+        'previsto': previsto
     }
     return render(request, 'fiscalizacao/listar_itens_obra.html', context)
 

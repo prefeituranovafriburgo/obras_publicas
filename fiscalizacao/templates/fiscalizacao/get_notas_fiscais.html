@@ -29,7 +29,7 @@
                             </thead>
                             <tbody>                                                    
                                 <td>{{nota.data}}</td>
-                                <td>R$ <span class="valor" id="valor-{{id}}-{{nota.id}}">{{nota.valor}}</span></td>
+                                <td>R$ <span class="valor" id="valor-{{id}}-{{nota.id}}">{{nota.get_valor}}</span></td>
                                 <td>{{nota.periodo_inicial|date:'d/m/y'}} <i>até</i> {{nota.periodo_final|date:'d/m/y'}}</td>                                                    
                             </tbody>
                         </table>                                                                                              
