@@ -593,7 +593,7 @@ def visualizar_obra(request, id):
 
     if Fotos.objects.filter(obra=obra.obra.id).exists():
         foto_exist=True
-        foto_url=Fotos.objects.get(obra=obra.obra.id).url
+        foto_url=Fotos.objects.filter(obra=obra.obra.id).last().url
     else:
         foto_exist=False
         foto_url=''
