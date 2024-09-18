@@ -33,7 +33,7 @@
                     <i class="fas fa-calendar-plus me-2"></i>
                     Aditivar
                 </a>
-                <a class="btn btn-danger my-auto mx-1" href="#">
+                <a class="btn btn-danger my-auto mx-1" href="{% url 'obra:reajustar' obra.id %}">
                     <i class="fas fa-dollar-sign me-2"></i>
                     Reajustar
                 </a>
@@ -42,6 +42,9 @@
                     <i class="fas fa-archive me-2"></i>
                     Arquivo
                 </a>
+                {% if foto.existe %}
+                <a href="{{foto.url}}" target="_blank" class="btn btn-success mx-1"><i class="fas  fa-camera me-2"></i>Fotos</a>
+                {% endif %}
                 <a class="btn btn-primary my-auto" href="{% url 'obra:visualizar' 'listar' %}">
                     <i class="far fa-arrow-alt-circle-left me-2"></i>
                     Voltar
@@ -56,7 +59,6 @@
                             <div class="d-flex ps-4">
                                 <span class="my-auto"><b>id: </b>{{obra.id}}</span>
                                 <span class="ms-auto">                                    
-                                    <a href="{% url 'obra:visualizar_fotos_obra' obra.id %}" class="btn btn-outline-success me-2">Fotos</a>
                                     <!-- <a href="{% url 'obra:visualizar_notas' obra.id %}" class="btn btn-outline-success">Notas</a>                                     -->
                                 </span>
                             </div>

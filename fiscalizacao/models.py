@@ -174,7 +174,7 @@ class Contrato(models.Model):
         return Reajustar.objects.filter(contrato=self).exists()
     
     def __str__(self):
-        return '%s - %s' % (self.id, self.nota_empenho)
+        return '%s - %s' % (self.id, self.obra)
 
 # class Aditivos(models.Model):
 
@@ -218,6 +218,7 @@ class Aditivar(models.Model):
     user_inclusao = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
 
 class Reajustar(models.Model):
+    contrato = models.ForeignKey(Contrato, on_delete=models.CASCADE, null=True)
     percentual = models.CharField(max_length=10, verbose_name='Percentual de reajuste')
     valor = models.CharField(max_length=20, verbose_name='Valor do reajuste(R$)')
     dt_inclusao = models.DateTimeField(auto_now_add=True, verbose_name='Dt. Inclusão')

@@ -1,7 +1,7 @@
 from textwrap import indent
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
-from .forms import Form_Contrato, Form_Fiscal, Form_Nota, Form_Empenho_Desabilitado, Form_Empenho, Form_Obras, Form_Empresa, Form_Aditivo
+from .forms import Form_Contrato, Form_Fiscal, Form_Nota, Form_Empenho_Desabilitado, Form_Empenho, Form_Obras, Form_Empresa, Form_Aditivo, Form_Reajuste
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
@@ -497,10 +497,10 @@ def aditivar_empenho(request, id):
         if form.is_valid():
             aditivo = form.save()                                                   
             aditivo.user_inclusao=request.user
-            form=Form_Empenho()
+            form=Form_Empenho(initial={'contrato': id, 'user_inclusao': request.user.id})
             success='Aditivo cadastrado com sucesso!'
     else:
-        form=Form_Aditivo(initial={'contrato': id})
+        form=Form_Aditivo(initial={'contrato': id, 'user_inclusao': request.user.id})
 
     context={
         'id': id,
@@ -509,8 +509,26 @@ def aditivar_empenho(request, id):
     }
     return render(request, 'fiscalizacao/aditivar_empenho.html', context)
 
-def reajustar(request, id):
-    return ''
+
+@login_required
+def reajustar_empenho(request, id):
+    success=''
+    if request.method=='POST':
+        form=Form_Reajuste(request.POST)
+        if form.is_valid():
+            aditivo = form.save()                                                   
+            aditivo.user_inclusao=request.user
+            form=Form_Reajuste(initial={'contrato': id, 'user_inclusao': request.user.id})
+            success='Aditivo cadastrado com sucesso!'
+    else:
+        form=Form_Aditivo(initial={'contrato': id, 'user_inclusao': request.user.id})
+
+    context={
+        'id': id,
+        'form': form,
+        'success': success
+    }
+    return render(request, 'fiscalizacao/reajustar_empenho.html', context)
 
 def get_obras(request):
     from django.db.models import Q
@@ -573,9 +591,17 @@ def visualizar_obra(request, id):
     for nota in empenhos_exercicio:
         v_total+=int(nota.valor)
 
+    if Fotos.objects.filter(obra=obra.obra.id).exists():
+        foto_exist=True
+        foto_url=Fotos.objects.get(obra=obra.obra.id).url
+    else:
+        foto_exist=False
+        foto_url=''
+
     context={
         'contrato': obra,
         'obra': obra,
+        'foto': {'existe': foto_exist, 'url': foto_url},
         'notas':empenhos_exercicio,
         'form': form,
         'progresso': progresso,

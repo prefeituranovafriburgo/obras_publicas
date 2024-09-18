@@ -1,4 +1,4 @@
-from .models import Contrato, Empresa, Fiscal, Nota_Empenho, Nota_Fiscal, Obra, Aditivar
+from .models import Contrato, Empresa, Fiscal, Nota_Empenho, Nota_Fiscal, Obra, Aditivar, Reajustar
 from .validations import validate_CNPJ
 
 from django import forms
@@ -108,6 +108,7 @@ class Form_Aditivo(ModelForm):
             'valor': forms.TextInput(attrs={'onkeydown':"maskValor(this)", 'onload':"maskValor(this)", 'class':'form-control mb-3'}),
             'inicio': forms.DateInput(attrs={'type':'date', 'class':'form-control mb-3'}),
             'fim': forms.DateInput(attrs={'type':'date', 'class':'form-control mb-3'}),  
+            'user_inclusao': forms.HiddenInput()
             }        
         exclude = ['dt_inclusao']
 
@@ -116,3 +117,22 @@ class Form_Aditivo(ModelForm):
         valor = valor.replace('.', '')
         valor = valor.replace(',', '')        
         return valor
+    
+class Form_Reajuste(ModelForm):
+    
+        class Meta:
+            model = Reajustar
+            widgets = {
+                'contrato': forms.HiddenInput(),
+                'valor': forms.TextInput(attrs={'onkeydown':"maskValor(this)", 'onload':"maskValor(this)", 'class':'form-control mb-3'}),
+                'inicio': forms.DateInput(attrs={'type':'date', 'class':'form-control mb-3'}),
+                'fim': forms.DateInput(attrs={'type':'date', 'class':'form-control mb-3'}),  
+                'user_inclusao': forms.HiddenInput()
+                }        
+            exclude = ['dt_inclusao']
+    
+        def clean_valor(self):                        
+            valor=self.cleaned_data["valor"]
+            valor = valor.replace('.', '')
+            valor = valor.replace(',', '')        
+            return valor
