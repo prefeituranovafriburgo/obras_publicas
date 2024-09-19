@@ -103,3 +103,4 @@ class LogAdmin(admin.ModelAdmin):
     list_filter = ('tabela', 'tipo')
     search_fields = ('acao', 'user')
     ordering = ('dt_inclusao',)
+    
