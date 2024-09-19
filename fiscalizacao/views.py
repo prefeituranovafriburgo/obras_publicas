@@ -1,7 +1,7 @@
 from textwrap import indent
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
-from .forms import Form_Contrato, Form_Fiscal, Form_Nota, Form_Empenho_Desabilitado, Form_Empenho, Form_Obras, Form_Empresa, Form_Aditivo, Form_Reajuste
+from .forms import Form_Contrato, Form_Fiscal, Form_Nota, Form_Empenho_Desabilitado, Form_Empenho, Form_Obras, Form_Empresa, Form_Aditivo, Form_Reajuste, Form_Foto
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
@@ -787,13 +787,16 @@ def visualizar_notas_arquivadas(request, id):
     }
     return render(request, 'fiscalizacao/listar_notas_obra_arquivadas.html', context)
 
+
 @login_required
 def editar_obra(request, id):
     print(id)
     contrato=Contrato.objects.get(id=id)
     form_obra=Form_Obras(instance=contrato.obra)
+    form_foto=Form_Foto(initial={'obra': contrato.obra})
     if request.method=='POST':
         form_obra_POST=Form_Obras(request.POST, instance=contrato.obra)
+        form_foto=Form_Foto(request.POST, request.FILES)
         if form_obra_POST.is_valid():
             # acoes={}
             # for i in form_obra_POST:      
@@ -811,6 +814,9 @@ def editar_obra(request, id):
                 #             'depois': form_obra_POST.cleaned_data[i.name].id
                 #         }                        
             obra=form_obra_POST.save()
+            if form_foto.is_valid():
+                form_foto.save()
+                form_foto=Form_Foto(request.POST, request.FILES)
             form_obra=Form_Obras(instance=obra)
             # log=Log(
             #         tabela='Obra',
@@ -826,7 +832,8 @@ def editar_obra(request, id):
     context={
         'obra': {'id':id},        
         'empresa': contrato.empresa.nome,
-        'form_obra': form_obra
+        'form_obra': form_obra,
+        'form_foto': form_foto
     }
     return render(request, 'fiscalizacao/listar_itens_obra_editar.html', context)
 

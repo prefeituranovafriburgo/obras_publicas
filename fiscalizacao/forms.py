@@ -1,8 +1,15 @@
-from .models import Contrato, Empresa, Fiscal, Nota_Empenho, Nota_Fiscal, Obra, Aditivar, Reajustar
+from .models import Contrato, Empresa, Fiscal, Nota_Empenho, Nota_Fiscal, Obra, Aditivar, Reajustar, Fotos
 from .validations import validate_CNPJ
 
 from django import forms
 from django.forms import ModelForm, ValidationError
+
+class Form_Foto(ModelForm):
+    class Meta:
+        model = Fotos
+        widgets = {'obra': forms.HiddenInput(),
+                   'url': forms.FileInput(attrs={'class':'form-control mb-3 w-100'})}    
+        exclude = ['dt_inclusao']
 
 class Form_Obras(ModelForm): 
 

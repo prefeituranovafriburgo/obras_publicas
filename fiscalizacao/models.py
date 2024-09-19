@@ -199,7 +199,7 @@ class Fotos(models.Model):
         verbose_name = 'Foto'
           
     obra=models.ForeignKey(Obra, on_delete=models.CASCADE) 
-    url=models.CharField(max_length=300)
+    url=models.CharField(max_length=300, verbose_name='Url para fotos')
 
     def __str__(self):
         return '%s' % (self.url)
