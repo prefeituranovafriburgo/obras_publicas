@@ -8,7 +8,7 @@ class Form_Foto(ModelForm):
     class Meta:
         model = Fotos
         widgets = {'obra': forms.HiddenInput(),
-                   'url': forms.FileInput(attrs={'class':'form-control mb-3 w-100'})}    
+                   'url': forms.TextInput(attrs={'class':'form-control mb-3 w-100'})}    
         exclude = ['dt_inclusao']
 
 class Form_Obras(ModelForm): 
