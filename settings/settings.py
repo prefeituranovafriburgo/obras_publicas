@@ -92,7 +92,7 @@ else:
             'ENGINE': 'django.db.backends.mysql',
 
             'NAME': db_name,
-            'PORT': '',
+            'PORT': '3306',
 
             'USER': db_user,
             'PASSWORD': db_passwd,
