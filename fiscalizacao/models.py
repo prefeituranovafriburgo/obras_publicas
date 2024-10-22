@@ -49,6 +49,7 @@ class Nota_Empenho(models.Model):
     def __str__(self):
         return '%s' % (self.n_nota)
 
+# MEDIÇÕES \/
 class Nota_Fiscal(models.Model):
     
     # PERIODO_CHOICES=[

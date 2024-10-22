@@ -297,14 +297,14 @@ def get_notas(request):
             contrato=Contrato.objects.get(id=request.GET.get('id'))
             notas=[]            
             for i in contrato.nota_empenho.filter(ativo=True):                
-                nf=Nota_Fiscal.objects.filter(empenho=i, ativo=True).order_by('id')
+                nf=Nota_Fiscal.objects.filter(empenho=i, ativo=True).order_by('periodo_inicial')
                 for n in nf:
                     notas.append(n)
 
             empenho_id=request.GET.get('id')
         else:
             empenho=Nota_Empenho.objects.get(id=request.GET.get('id'))
-            notas=Nota_Fiscal.objects.filter(empenho=empenho, ativo=True).order_by('id') 
+            notas=Nota_Fiscal.objects.filter(empenho=empenho, ativo=True).order_by('periodo_inicial') 
             empenho_id=empenho.n_nota   
     except Exception as E:
         print(E)

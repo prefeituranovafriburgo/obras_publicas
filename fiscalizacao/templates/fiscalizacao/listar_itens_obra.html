@@ -44,6 +44,8 @@
                 </a>
                 {% if foto.existe %}
                 <a href="{{foto.url}}" target="_blank" class="btn btn-success mx-1"><i class="fas  fa-camera me-2"></i>Fotos</a>
+                {% else %}
+                <a onclick="alert('Não há fotos cadastradas ainda.')" class="btn btn-success mx-1"><i class="fas  fa-camera me-2"></i>Fotos</a>
                 {% endif %}
                 <a class="btn btn-primary my-auto" href="{% url 'obra:visualizar' 'listar' %}">
                     <i class="far fa-arrow-alt-circle-left me-2"></i>
