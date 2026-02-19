@@ -383,7 +383,17 @@ def cadastrar_obra(request):
         list_empenhos=[]
 
         for id in id_empenhos:
-            list_empenhos.append(Nota_Empenho.objects.get(n_nota=id))
+            try:
+                empenho = Nota_Empenho.objects.get(n_nota=id)
+                list_empenhos.append(empenho)
+            except Nota_Empenho.DoesNotExist:
+                error = f'Empenho não encontrado: {id}'
+                context = {
+                    'error': error,
+                    'form_nota': Form_Empenho(),
+                    'form_obra': Form_Obras(initial={'cadastrado_por': request.user}),
+                }
+                return render(request, 'fiscalizacao/cadastrar_obra.html', context)
 
         
         form_obra=Form_Obras(request.POST)
@@ -531,27 +541,50 @@ def reajustar_empenho(request, id):
     return render(request, 'fiscalizacao/reajustar_empenho.html', context)
 
 def get_obras(request):
-    from django.db.models import Q
+    # Temporary logging wrapper to help diagnose server-only failures
+    try:
+        from django.db.models import Q
+        import traceback
+        import datetime
 
-    valor=request.GET.get('nome')
+        valor = request.GET.get('nome', '') or ''
 
-    if valor!='':
-        complexQuery = Q(empresa__nome__icontains=valor) | Q(id__icontains=valor) | Q(obra__objeto_da_obra__icontains=valor) | Q(obra__status__nome__icontains=valor) | Q(obra__fiscal__nome__icontains=valor)
-        obras=Contrato.objects.filter(complexQuery)
-        context={           
-            'obras': obras
-        }
-        if len(obras)==0:
-            context={
-                'alert': True,
-                'obras': Contrato.objects.all()
-            }
-    else:            
-        context={
-            'alert': False,
-            'obras': Contrato.objects.all()
-        }
-    return render(request, 'fiscalizacao/get_obras.html', context)
+        if valor != '':
+            complexQuery = (
+                Q(empresa__nome__icontains=valor)
+                | Q(id__icontains=valor)
+                | Q(obra__objeto_da_obra__icontains=valor)
+                | Q(obra__status__nome__icontains=valor)
+                | Q(obra__fiscal__nome__icontains=valor)
+            )
+            obras = Contrato.objects.filter(complexQuery)
+            context = { 'obras': obras }
+            if len(obras) == 0:
+                context = { 'alert': True, 'obras': Contrato.objects.all() }
+        else:
+            context = { 'alert': False, 'obras': Contrato.objects.all() }
+
+        return render(request, 'fiscalizacao/get_obras.html', context)
+
+    except Exception as e:
+        # attempt to write diagnostics to a local logfile so we can inspect the server
+        try:
+            import os
+            os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
+            log_path = os.path.join(BASE_DIR, 'logs', 'get_obras.log')
+            with open(log_path, 'a', encoding='utf-8') as f:
+                f.write(f"[{datetime.datetime.now().isoformat()}] Exception in get_obras: {e}\n")
+                f.write(traceback.format_exc())
+                try:
+                    f.write(f"GET params: {request.GET.dict()}\n")
+                except Exception:
+                    f.write("Failed to read GET params\n")
+        except Exception:
+            pass
+
+        # Return a safe empty result so the frontend doesn't break
+        context = { 'alert': True, 'obras': Contrato.objects.none() }
+        return render(request, 'fiscalizacao/get_obras.html', context)
 
 
 def listar_obras(request, valor_busca):
