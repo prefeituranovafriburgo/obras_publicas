@@ -34,7 +34,7 @@ except:
 
 
 INSTALLED_APPS = [
-    'bootstrap5',
+    'django_bootstrap5',
     'widget_tweaks',
     'qr_code',
     'rest_framework.authtoken',
