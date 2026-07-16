@@ -401,9 +401,9 @@ def cadastrar_obra(request):
         try:
             empresa=Empresa.objects.get(nome=request.POST['empresa'])    
             go=True
-        except:
-            print(request.POST['empresa'])
+        except Empresa.DoesNotExist:
             go=False
+            error=f'Empresa "{request.POST["empresa"]}" não encontrada. Selecione uma empresa da lista.'
         
         if go:
             if form_obra.is_valid() and len(list_empenhos)>0:            
@@ -423,7 +423,7 @@ def cadastrar_obra(request):
                     except Exception as E:
                         print(E)
 
-                    os.mkdir(str(BASE_DIR)+'/settings/static/fotos/'+str(contrato.id))
+                    os.makedirs(str(BASE_DIR)+'/settings/static/fotos/'+str(contrato.id), exist_ok=True)
                     error=False
                 except Exception as E:
                     error=str(E)
@@ -432,17 +432,18 @@ def cadastrar_obra(request):
                     'error': error,               
                     'form_nota': Form_Empenho(),
                     'form_obra': Form_Obras(initial={'cadastrado_por':request.user}),
-                    'success': 'Obra cadastrada com sucesso!'
+                    'success': 'Obra cadastrada com sucesso!' if not error else None
                 }
                 return render(request, 'fiscalizacao/cadastrar_obra.html', context)
             else:
-                print(form_obra.errors)
-                print(len(list_empenhos))
-                error='ERROR'    
-        else:
-            print(form_obra.errors)
-            print(len(list_empenhos))
-            error='ERROR'
+                erros = []
+                if not form_obra.is_valid():
+                    for campo, msgs in form_obra.errors.items():
+                        label = form_obra.fields[campo].label or campo
+                        erros.append(f'{label}: {", ".join(msgs)}')
+                if len(list_empenhos)==0:
+                    erros.append('Adicione pelo menos uma nota de empenho.')
+                error=' | '.join(erros)
 
     else:
         error=False        
@@ -872,7 +873,7 @@ def editar_obra(request, id):
 
 @login_required
 def gerar_qr_code(request, obra_id):
-    conteudo = f'''obras.pmnf.rj.gov.br/dados-obras/v/{obra_id}'''
+    conteudo = f'''http://192.168.5.4:8000/dados-obras/v/{obra_id}'''
     context={
         'conteudo': conteudo,
         'obra_id': obra_id
